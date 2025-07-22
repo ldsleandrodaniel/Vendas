@@ -50,17 +50,9 @@ namespace Lanches.Context
                 .Property(pd => pd.PedidoDetalheId)
                 .UseIdentityAlwaysColumn();
 
-            modelBuilder.Entity<Empresa>().HasData(
-               new Empresa
-               {
-                   EmpresaId = 1,
-                   Nome = "Empresa",
-                   Endereco = "Endereco",
-                   Telefone = "55........",
-                   Email = "email@email.com",
-                   LogoUrl = "https://neigrando.com/wp-content/uploads/2021/12/empresa-da-nova-economia.jpg"
-               }
-           );
+            modelBuilder.Entity<Empresa>()
+                  .Property(e => e.EmpresaId)
+                 .UseIdentityColumn();
 
 
 
