@@ -1,0 +1,59 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "F:\\PEDIDO COMERCIAL\\pedido\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A960B826-8DD7-4AB3-A092-B7E78FFB56AF}|Pedidos.csproj|f:\\pedido comercial\\pedido\\dockerfile||{8B32D3C3-DE93-4189-A718-190E63FEED23}",
+      "RelativeMoniker": "D:0:0:{A960B826-8DD7-4AB3-A092-B7E78FFB56AF}|Pedidos.csproj|solutionrelative:dockerfile||{8B32D3C3-DE93-4189-A718-190E63FEED23}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Dockerfile",
+              "DocumentMoniker": "F:\\PEDIDO COMERCIAL\\pedido\\Dockerfile",
+              "RelativeDocumentMoniker": "Dockerfile",
+              "ToolTip": "F:\\PEDIDO COMERCIAL\\pedido\\Dockerfile",
+              "RelativeToolTip": "Dockerfile",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAA0AAAAkAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-07-22T16:18:43.61Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 759,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -4,7 +4,7 @@ WORKDIR /src
 
 # 1. Copia arquivos necessários
 COPY ["*.csproj", "."]
-RUN dotnet restore "Peidos.csproj"
+RUN dotnet restore "Pedidos.csproj"
 
 # 2. Copia o resto
 COPY . .
