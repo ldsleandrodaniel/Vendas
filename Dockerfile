@@ -10,7 +10,7 @@ RUN dotnet restore "Lanches.csproj"
 COPY . .
 
 # 3. Publica o projeto
-RUN dotnet publish "Lanches.csproj" -c Release -o /app \
+RUN dotnet publish "Pedido.csproj" -c Release -o /app \
     -p:RuntimeIdentifier=linux-x64 \
     --self-contained false
 
@@ -33,4 +33,4 @@ ENV ASPNETCORE_ENVIRONMENT=Production
 COPY --from=build /app .
 
 # 7. Entrypoint
-ENTRYPOINT ["dotnet", "Lanches.dll"]
+ENTRYPOINT ["dotnet", "Pedido.dll"]
