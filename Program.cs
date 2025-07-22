@@ -9,43 +9,28 @@ using Microsoft.EntityFrameworkCore;
 using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Pedidos.Services;
+using Npgsql;
 
-// Serverlocalhost;Port=5432;Database=ProdutosDatabase;User Id=postgres;Password=Lds148253#;Include Error Detail=true
 var builder = WebApplication.CreateBuilder(args);
 
 // ===============================================
-// CONFIGURAÇÕES INICIAIS COM TRATAMENTO DE ERROS
+// CONFIGURAÇÕES INICIAIS COM TRATAMENTO DE MIGRAÇÕES ROBUSTO
 // ===============================================
-
-using (var scope = builder.Services.BuildServiceProvider().CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<SeuDbContext>();
-    if (db.Database.GetPendingMigrations().Any())
-    {
-        Console.WriteLine("Aplicando migrações pendentes...");
-        db.Database.Migrate();
-    }
-}
-
-
 
 // Debug: Mostrar todas as configurações carregadas
 Console.WriteLine("=== CONFIGURAÇÕES CARREGADAS ===");
 Console.WriteLine(builder.Configuration.GetDebugView());
 
 // Validação aprimorada da connection string
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrEmpty(connectionString))
-{
-    connectionString = builder.Configuration["POSTGRES_CONNECTION_STRING"] 
-        ?? throw new Exception("""
-            ERRO: ConnectionString não configurada!
-            Defina UMA dessas variáveis no Render:
-            1. ConnectionStrings__DefaultConnection
-            2. POSTGRES_CONNECTION_STRING
-            Formato: Server=...;Port=5432;Database=...;User Id=...;Password=...;
-            """);
-}
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+    ?? builder.Configuration["POSTGRES_CONNECTION_STRING"]
+    ?? throw new Exception("""
+        ERRO: ConnectionString não configurada!
+        Defina UMA dessas variáveis:
+        1. ConnectionStrings__DefaultConnection
+        2. POSTGRES_CONNECTION_STRING
+        Formato: Server=...;Port=5432;Database=...;User Id=...;Password=...;
+        """);
 
 // Configuração do PostgreSQL com resiliência
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -65,6 +50,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         options.EnableSensitiveDataLogging();
     }
 });
+
+// ===============================================
+// NOVA IMPLEMENTAÇÃO DE MIGRAÇÕES SEGURA
+// ===============================================
+
+// Aplica migrações de forma segura durante a inicialização
+builder.Services.AddHostedService<MigrationHostedService>();
+
+// ===============================================
+// CONFIGURAÇÕES EXISTENTES (mantidas conforme seu código original)
+// ===============================================
 
 // Configuração de proxy para o Render
 builder.Services.Configure<ForwardedHeadersOptions>(options => 
@@ -146,7 +142,8 @@ if (!app.Environment.IsDevelopment())
     }
     catch (Exception ex)
     {
-        throw new Exception("FALHA NA CONEXÃO COM O BANCO: " + ex.Message);
+        Console.WriteLine("FALHA NA CONEXÃO COM O BANCO: " + ex.Message);
+        throw;
     }
 }
 
@@ -178,28 +175,6 @@ else
 app.UseStaticFiles();
 app.UseRouting();
 
-// Aplicar migrations automaticamente
-if (!app.Environment.IsDevelopment()) 
-{
-    using (var scope = app.Services.CreateScope()) 
-    {
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        try
-        {
-            db.Database.Migrate();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"ERRO NAS MIGRAÇÕES: {ex.Message}");
-            throw;
-        }
-    }
-}
-
-// Rota de debug (remova em produção)
-app.MapGet("/debug-config", () => 
-    Results.Text(builder.Configuration.GetDebugView(), "text/plain"));
-
 CriarPerfisUsuarios(app);
 app.UseSession();
 app.UseAuthentication();
@@ -218,7 +193,6 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
 
 app.Run();
 
@@ -242,4 +216,67 @@ void CriarPerfisUsuarios(WebApplication app)
     {
         Console.WriteLine($"ERRO AO CRIAR PERFIS: {ex.Message}");
     }
+}
+
+// ===============================================
+// NOVA CLASSE PARA GERENCIAMENTO DE MIGRAÇÕES
+// =================================================
+
+public class MigrationHostedService : IHostedService
+{
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<MigrationHostedService> _logger;
+
+    public MigrationHostedService(IServiceProvider serviceProvider, ILogger<MigrationHostedService> logger)
+    {
+        _serviceProvider = serviceProvider;
+        _logger = logger;
+    }
+
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        using var scope = _serviceProvider.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        
+        try
+        {
+            _logger.LogInformation("Verificando migrações pendentes...");
+            
+            // Verifica se a tabela de histórico existe
+            var historyTableExists = await dbContext.Database.ExecuteSqlRawAsync(
+                "SELECT 1 FROM information_schema.tables WHERE table_name = '__EFMigrationsHistory'", 
+                cancellationToken) > 0;
+
+            if (historyTableExists)
+            {
+                var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(cancellationToken);
+                if (pendingMigrations.Any())
+                {
+                    _logger.LogInformation($"Aplicando {pendingMigrations.Count()} migrações pendentes...");
+                    await dbContext.Database.MigrateAsync(cancellationToken);
+                    _logger.LogInformation("Migrações aplicadas com sucesso!");
+                }
+                else
+                {
+                    _logger.LogInformation("Nenhuma migração pendente.");
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Banco novo - aplicando todas as migrações...");
+                await dbContext.Database.MigrateAsync(cancellationToken);
+            }
+        }
+        catch (PostgresException ex) when (ex.SqlState == "42P07") // Tabela já existe
+        {
+            _logger.LogWarning($"Tabela já existe: {ex.TableName}. Continuando...");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro durante migrações");
+            throw;
+        }
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }
