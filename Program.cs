@@ -17,6 +17,18 @@ var builder = WebApplication.CreateBuilder(args);
 // CONFIGURAÇÕES INICIAIS COM TRATAMENTO DE ERROS
 // ===============================================
 
+using (var scope = builder.Services.BuildServiceProvider().CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<SeuDbContext>();
+    if (db.Database.GetPendingMigrations().Any())
+    {
+        Console.WriteLine("Aplicando migrações pendentes...");
+        db.Database.Migrate();
+    }
+}
+
+
+
 // Debug: Mostrar todas as configurações carregadas
 Console.WriteLine("=== CONFIGURAÇÕES CARREGADAS ===");
 Console.WriteLine(builder.Configuration.GetDebugView());
