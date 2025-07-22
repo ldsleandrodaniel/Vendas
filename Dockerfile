@@ -4,13 +4,13 @@ WORKDIR /src
 
 # 1. Copia arquivos necessários
 COPY ["*.csproj", "."]
-RUN dotnet restore "Lanches.csproj"
+RUN dotnet restore "Peidos.csproj"
 
 # 2. Copia o resto
 COPY . .
 
 # 3. Publica o projeto
-RUN dotnet publish "Pedido.csproj" -c Release -o /app \
+RUN dotnet publish "Pedidos.csproj" -c Release -o /app \
     -p:RuntimeIdentifier=linux-x64 \
     --self-contained false
 
@@ -33,4 +33,4 @@ ENV ASPNETCORE_ENVIRONMENT=Production
 COPY --from=build /app .
 
 # 7. Entrypoint
-ENTRYPOINT ["dotnet", "Pedido.dll"]
+ENTRYPOINT ["dotnet", "Pedidos.dll"]

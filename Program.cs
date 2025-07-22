@@ -10,6 +10,7 @@ using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Pedidos.Services;
 
+// Serverlocalhost;Port=5432;Database=ProdutosDatabase;User Id=postgres;Password=Lds148253#;Include Error Detail=true
 var builder = WebApplication.CreateBuilder(args);
 
 // ===============================================
