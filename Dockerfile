@@ -6,33 +6,31 @@ WORKDIR /src
 COPY ["*.csproj", "."]
 RUN dotnet restore "Pedidos.csproj"
 
-# 2. Copia o resto do código
+# 2. Copia o resto
 COPY . .
 
-# 3. Publica o projeto com otimizações
+# 3. Publica o projeto
 RUN dotnet publish "Pedidos.csproj" -c Release -o /app \
     -p:RuntimeIdentifier=linux-x64 \
-    --self-contained false \
-    --no-restore
+    --self-contained false
 
 # Estágio de runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 
-# 4. Instala dependências essenciais
+# 4. Instala dependências para PostgreSQL
 RUN apt-get update && \
     apt-get install -y libgdiplus && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# 5. Configurações de ambiente
+# 5. Configurações essenciais
 EXPOSE 80
 ENV ASPNETCORE_URLS=http://+:80
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV DOTNET_RUNNING_IN_CONTAINER=true
 
 # 6. Copia os arquivos publicados
 COPY --from=build /app .
 
-# 7. Entrypoint inteligente para migrações
-ENTRYPOINT ["sh", "-c", "if [ \"$SKIP_MIGRATIONS\" != \"true\" ]; then dotnet Pedidos.dll --check-migrations; fi && dotnet Pedidos.dll"]
+# 7. Entrypoint
+ENTRYPOINT ["dotnet", "Pedidos.dll"]
