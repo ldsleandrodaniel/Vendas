@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Lanches.Models.Pedido>
+
+@{
+    ViewData["Title"] = "Pedidos Não Entregues";
+    
+}
+
+<h1>Pedidos Não Entregues</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Email</th>
+            <th>Total</th>
+            <th>Itens</th>
+            <th>Data Pedido</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.PedidoId</td>
+                <td>@item.Nome @item.Sobrenome</td>
+                <td>@item.Email</td>
+                <td>@item.PedidoTotal.ToString("C")</td>
+                <td>@item.TotalItensPedido</td>
+                <td>@item.PedidoEnviado.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>
+                    <form asp-action="MarcarComoEntregue" method="post">
+                        <input type="hidden" name="id" value="@item.PedidoId" />
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check"></i> Marcar como Entregue
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

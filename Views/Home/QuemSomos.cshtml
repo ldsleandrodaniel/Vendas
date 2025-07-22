@@ -1,0 +1,61 @@
+﻿@{
+    var empresa = await EmpresaService.GetDadosEmpresaAsync();
+    var logoUrl = empresa?.LogoUrl ?? Configuration["Empresa:LogoUrl"];
+    var nomeEmpresa = empresa?.Nome ?? Configuration["Empresa:Nome"];
+    var descricaoEmpresa = empresa?.Descricao ?? Configuration["Empresa:Descricao"];
+    ViewData["Title"] = "Quem Somos";
+    Layout = "_Layout"; // Garante que herda as variáveis do Layout
+
+}
+
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-sm-8 col-md-6 col-lg-5">
+            <!-- Card da Empresa -->
+            <div class="card mb-4 shadow-sm">
+                @if (!string.IsNullOrEmpty(logoUrl))
+                {
+                    <img src="@logoUrl" class="card-img-top img-fluid p-3" alt="@nomeEmpresa">
+                }
+
+                <div class="card-body">
+                    <h3 class="card-title text-center">@nomeEmpresa</h3>
+
+                    <div class="my-3 p-3 bg-light rounded">
+                        <h5 class="text-center">Quem Somos</h5>
+                        <p class="card-text">@descricaoEmpresa</p>
+                    </div>
+
+                    <!-- Se precisar de outros dados, adicione aqui -->
+                    <!-- Exemplo adicional (opcional): -->
+                    @*
+                    <div class="row text-center">
+                    <div class="col-6">
+                    <h5><i class="bi bi-geo-alt"></i> Endereço</h5>
+                    <p>@empresa?.Endereco</p>
+                    </div>
+                    <div class="col-6">
+                    <h5><i class="bi bi-telephone"></i> Contato</h5>
+                    <p>@empresa?.Telefone</p>
+                    <p>@empresa?.Email</p>
+                    </div>
+                    </div>
+                    *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 10px;
+        border: none;
+    }
+
+    .card-img-top {
+        max-height: 250px;
+        object-fit: contain;
+    }
+</style>

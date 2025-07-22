@@ -1,0 +1,53 @@
+﻿@model Pedidos.ViewModels.AlterarSenhaViewModel
+
+@{
+    ViewData["Title"] = "Alterar Senha";
+}
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>@ViewData["Title"]</h2>
+        <a asp-area="Admin" asp-controller="Admin" asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar para Admin
+        </a>
+    </div>
+
+    @if (TempData["Sucesso"] != null)
+    {
+        <div class="alert alert-success">@TempData["Sucesso"]</div>
+    }
+    @if (TempData["Erro"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Erro"]</div>
+    }
+
+    <form asp-action="AlteraSenha" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="form-group mb-3">
+            <label asp-for="SenhaAtual" class="form-label"></label>
+            <input asp-for="SenhaAtual" class="form-control" type="password" />
+            <span asp-validation-for="SenhaAtual" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="NovaSenha" class="form-label"></label>
+            <input asp-for="NovaSenha" class="form-control" type="password" />
+            <span asp-validation-for="NovaSenha" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="ConfirmacaoSenha" class="form-label"></label>
+            <input asp-for="ConfirmacaoSenha" class="form-control" type="password" />
+            <span asp-validation-for="ConfirmacaoSenha" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Alterar Senha</button>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

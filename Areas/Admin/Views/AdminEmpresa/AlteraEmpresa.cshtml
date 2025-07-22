@@ -1,0 +1,168 @@
+﻿@model Pedidos.Models.Empresa
+@{
+    ViewData["Title"] = "Editar Dados da Empresa";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title">@ViewData["Title"]</h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="AlteraEmpresa">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="EmpresaId" />
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="Nome" class="form-label"></label>
+                            <input asp-for="Nome" class="form-control" />
+                            <span asp-validation-for="Nome" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Descricao" class="form-label"></label>
+                            <textarea asp-for="Descricao" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Descricao" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Endereco" class="form-label"></label>
+                            <input asp-for="Endereco" class="form-control" />
+                            <span asp-validation-for="Endereco" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="Telefone" class="form-label"></label>
+                            <input asp-for="Telefone" class="form-control" />
+                            <span asp-validation-for="Telefone" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" type="email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="LogoUrl" class="form-label"></label>
+                            <div class="input-group">
+                                <input asp-for="LogoUrl" class="form-control" id="logoUrlInput" />
+                                <button class="btn btn-outline-secondary" type="button" id="selectImageBtn" data-bs-toggle="modal" data-bs-target="#imageModal">
+                                    <i class="bi bi-folder2-open"></i> Selecionar
+                                </button>
+                            </div>
+                            <span asp-validation-for="LogoUrl" class="text-danger"></span>
+                            @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                            {
+                                <div class="mt-2 d-flex align-items-center">
+                                    <img src="/images/@Model.LogoUrl" alt="Logo" style="max-height: 100px;" class="img-thumbnail me-2" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Salvar Alterações
+                    </button>
+                    <a asp-area="Admin" asp-controller="AdminEmpresa" asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para seleção de imagens -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Selecionar Imagem</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row" id="imageGallery">
+                        <div class="col-12 text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Carregando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+
+    <script>
+        $(document).ready(function () {
+            // Carrega as imagens quando o modal é aberto
+            $('#imageModal').on('show.bs.modal', function () {
+                loadImages();
+            });
+
+            function loadImages() {
+                $.get('@Url.Action("GetImagens", "AdminEmpresa")', function (data) {
+                    const gallery = $('#imageGallery');
+                    gallery.empty();
+
+                    if (data.error) {
+                        gallery.html(`<div class="col-12 text-center"><p class="text-danger">${data.error}</p></div>`);
+                        return;
+                    }
+
+                    if (data.length === 0) {
+                        gallery.html('<div class="col-12 text-center"><p>Nenhuma imagem encontrada na pasta /images/</p></div>');
+                        return;
+                    }
+
+                    // Ordena as imagens alfabeticamente
+                    data.sort();
+
+                    data.forEach(function (image) {
+                        const col = $('<div class="col-md-3 mb-3"></div>');
+                        const card = $('<div class="card h-100"></div>');
+                        const img = $(`<img src="/images/${image}" class="card-img-top img-thumbnail" style="height: 120px; object-fit: cover;" alt="${image}">`);
+                        const body = $('<div class="card-body p-2 text-center"></div>');
+                        const btn = $(`<button class="btn btn-sm btn-primary select-image-btn" data-image="${image}">Selecionar</button>`);
+
+                        body.append(btn);
+                        card.append(img).append(body);
+                        col.append(card);
+                        gallery.append(col);
+                    });
+
+                    // Adiciona evento de clique nos botões de seleção
+                    $('.select-image-btn').click(function () {
+                        const imageName = $(this).data('image');
+                        $('#logoUrlInput').val(imageName);
+                        $('#imageModal').modal('hide');
+
+                        // Atualiza a pré-visualização da imagem
+                        $('.img-thumbnail').attr('src', `/images/${imageName}`);
+                    });
+                }).fail(function (xhr, status, error) {
+                    $('#imageGallery').html(`<div class="col-12 text-center"><p class="text-danger">Erro ao carregar imagens: ${error}</p></div>`);
+                });
+            }
+        });
+    </script>
+}

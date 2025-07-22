@@ -1,0 +1,40 @@
+﻿@{
+    var empresa = await EmpresaService.GetDadosEmpresaAsync();
+    var emailEmpresa = empresa?.Email ?? Configuration["Empresa:Email"];
+    var telefoneEmpresa = empresa?.Telefone ?? Configuration["Empresa:Telefone"];
+}
+
+<footer>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between w-100 align-items-center">
+                <!-- Contatos em linha -->
+                <div class="d-flex align-items-center gap-4">
+                    <span class="text-white">Tem alguma dúvida?</span>
+                    <span class="text-yellow">
+                        <i class="bi bi-telephone"></i> @telefoneEmpresa
+                    </span>
+                    <span class="text-yellow">
+                        <i class="bi bi-envelope"></i> @emailEmpresa
+                    </span>
+                </div>
+
+                <!-- Imagem e copyright ajustados -->
+                <div class="d-flex align-items-center" style="gap: 8px">
+                    <img src="~/images/leaDerSoft.jpg" alt="LeaderSoft" style="height: 60px; width: auto; object-fit: contain;">
+                    <span class="small text-white-50" style="margin-left: 5px">LeaDerSoft (c)2025</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+</footer>
+
+<style>
+    .text-yellow {
+        color: yellow;
+    }
+
+    .gap-4 {
+        gap: 1.5rem;
+    }
+</style>

@@ -1,0 +1,9 @@
+﻿@using Lanches
+@using Lanches.Models
+@using Pedidos.Models
+@using Lanches.ViewModels
+@using Microsoft.Extensions.Configuration
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper Lanches.TagHelpers.*,Produtos
+@inject IConfiguration Configuration
+@inject Pedidos.Services.EmpresaService EmpresaService

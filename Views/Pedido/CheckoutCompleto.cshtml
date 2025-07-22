@@ -1,0 +1,70 @@
+﻿@model Pedido
+@{
+    var empresa = await EmpresaService.GetDadosEmpresaAsync();
+    var emailEmpresa = empresa?.Email ?? Configuration["Empresa:Email"];
+    var telefoneEmpresa = empresa?.Telefone ?? Configuration["Empresa:Telefone"]; }
+
+<div class="container">
+    <div class="jumbotron">
+        <h2>@ViewBag.CheckoutCompletoMensagem</h2>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <p>Cliente: <strong>@Model.Nome</strong></p>
+            <p>Data do Pedido: <strong>@Model.PedidoEnviado</strong></p>
+            <p>Número do Pedido: <strong>@Model.PedidoId</strong></p>
+
+            <table class="table">
+                <tr>
+                    <th></th>
+                    <th>Quantidade</th>
+                    <th>Produto</th>
+                    <th>Preço</th>
+                </tr>
+                @foreach (var item in Model.PedidoItens)
+                {
+                    <tr>
+                        <td><img src="@item.Produto.ImagemUrl" width="40" height="40" /></td>
+                        <td>@item.Quantidade</td>
+                        <td>@item.Produto.Nome</td>
+                        <td>@item.Produto.Preco</td>
+                    </tr>
+                }
+            </table>
+
+            <h4>Valor Total do Pedido: <strong>@(((decimal)ViewBag.TotalPedido).ToString("C2"))</strong></h4>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6 text-center mb-2">
+        <!-- Botão WhatsApp -->
+        @{
+            var mensagemWhats = $"Olá, confirmo meu pedido #{Model.PedidoId} no valor de {((decimal)ViewBag.TotalPedido).ToString("C2")}";
+            var linkWhats = $"https://wa.me/55{@telefoneEmpresa}?text={Uri.EscapeDataString(mensagemWhats)}";
+        }
+        <a href="@linkWhats" class="btn btn-success btn-lg" target="_blank">
+            <i class="bi bi-whatsapp"></i> Confirmar via WhatsApp
+        </a>
+    </div>
+
+    <div class="col-md-6 text-center mb-2">
+        <!-- Botão Email -->
+        @{
+            var assuntoEmail = $"Confirmação do Pedido #{Model.PedidoId}";
+            var corpoEmail = $"Confirmo meu pedido #{Model.PedidoId} no valor de {((decimal)ViewBag.TotalPedido).ToString("C2")}.\n\nCliente: {Model.Nome}\nData: {Model.PedidoEnviado}";
+            var linkEmail = $"mailto:{@emailEmpresa}?subject={Uri.EscapeDataString(assuntoEmail)}&body={Uri.EscapeDataString(corpoEmail)}";
+        }
+        <a href="@linkEmail" class="btn btn-primary btn-lg">
+            <i class="bi bi-envelope"></i> Confirmar via Email
+        </a>
+    </div>
+</div>
+
+<div class="form-group text-center mt-3">
+    <h3>
+        <a class="nav-link text-info" asp-controller="Home" asp-action="Index">Retornar</a>
+    </h3>
+</div>
