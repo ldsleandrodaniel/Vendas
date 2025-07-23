@@ -53,7 +53,7 @@ namespace Pedidos.Areas.Admin.Controllers
         [HttpGet]
             public async Task<IActionResult> AlteraEmpresa()
             {
-                var empresa = await _context.empresas.FirstOrDefaultAsync(); // Pega a primeira (e única) empresa
+                var empresa = await _context.Empresas.FirstOrDefaultAsync(); // Pega a primeira (e única) empresa
            
             return View(empresa);
             }

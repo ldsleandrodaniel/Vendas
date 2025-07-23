@@ -24,7 +24,7 @@ namespace Lanches.Context
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<PedidoDetalhe> PedidoDetalhes  { get; set; }
 
-        public DbSet<Empresa> empresas { get; set; }
+        public DbSet<Empresa> Empresas { get; set; }
 
       
         protected override void OnModelCreating(ModelBuilder modelBuilder)

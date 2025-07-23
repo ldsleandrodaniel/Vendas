@@ -18,7 +18,7 @@ namespace Pedidos.Services {
 
             public async Task<Empresa> GetDadosEmpresaAsync()
             {
-                var empresa = await _context.empresas.FirstOrDefaultAsync();
+                var empresa = await _context.Empresas.FirstOrDefaultAsync();
 
                 if (empresa == null)
                 {
@@ -32,7 +32,7 @@ namespace Pedidos.Services {
                         Email = _configuration["Empresa:Email"]
                     };
 
-                    _context.empresas.Add(empresa);
+                    _context.Empresas.Add(empresa);
                     await _context.SaveChangesAsync();
                 }
 
