@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using ReflectionIT.Mvc.Paging;
 using Microsoft.AspNetCore.HttpOverrides;
 using Pedidos.Services;
+using System.Globalization;
 
 // Serverlocalhost;Port=5432;Database=ProdutosDatabase;User Id=postgres;Password=Lds148253#;Include Error Detail=true
 var builder = WebApplication.CreateBuilder(args);
@@ -113,6 +114,14 @@ builder.Services.AddSession(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
+
+var cultureInfo = new CultureInfo("pt-BR");
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
+// Força o uso da cultura pt-BR mesmo em ambientes restritos
+AppContext.SetSwitch("System.Globalization.Invariant", false);
+
 
 var app = builder.Build();
 

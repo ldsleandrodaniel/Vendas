@@ -2,13 +2,11 @@
 
 <div class="Container">
     <div class="row checkoutForm">
-
         <div>
             <img src="~/images/Full-Cart-icon.png" width="30" height="35" /> <h4>Seu carrinho de compras : </h4>
         </div>
 
         <table class="table table-bordered table-striped">
-
             <thead>
                 <tr>
                     <th>Quantidade</th>
@@ -22,13 +20,26 @@
             <tbody>
                 @foreach (var item in Model.CarrinhoCompra.CarrinhoCompraItems)
                 {
-                    <tr>
-                        <td class="text-center">@item.Quantidade</td>
+                    <tr data-produto-id="@item.Produto.ProdutoId">
+                        <td class="text-left">
+                            <div class="input-group" style="width: 120px;">
+                                <button type="button" class="btn btn-outline-secondary btn-sm diminuir"
+                                        data-produto-id="@item.Produto.ProdutoId">
+                                    -
+                                </button>
+                                <span class="form-control text-center quantidade"
+                                      data-produto-id="@item.Produto.ProdutoId">@item.Quantidade</span>
+                                <button type="button" class="btn btn-outline-secondary btn-sm aumentar"
+                                        data-produto-id="@item.Produto.ProdutoId">
+                                    +
+                                </button>
+                            </div>
+                        </td>
                         <td class="text-left">@item.Produto.Nome</td>
-                        <td class="text-right">@item.Produto.Preco.ToString("c")</td>
+                        <td class="text-right">@item.Produto.Preco.ToString("C")</td>
 
-                        <td class="text-right">
-                            @((item.Quantidade * item.Produto.Preco).ToString("c"))
+                        <td class="text-right subtotal">
+                            @((item.Quantidade * item.Produto.Preco).ToString("C"))
                         </td>
 
                         <td class="text-center">
@@ -43,13 +54,12 @@
             <tfoot>
                 <tr>
                     <td colspan="3" class="text-right">Total:</td>
-                    <td class="text-right">
-                        @Model.CarrinhoCompraTotal.ToString("c")
+                    <td class="text-right" id="carrinho-total">
+                        @Model.CarrinhoCompraTotal.ToString("C")
                     </td>
                 </tr>
             </tfoot>
         </table>
-
 
         <div class="text-right">
             <div class="btn-group">
@@ -61,3 +71,45 @@
         <br />
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Evento para aumentar quantidade
+            $(document).on('click', '.aumentar', function () {
+                const produtoId = $(this).data('produto-id');
+                atualizarQuantidade(produtoId, 1);
+            });
+
+            // Evento para diminuir quantidade
+            $(document).on('click', '.diminuir', function () {
+                const produtoId = $(this).data('produto-id');
+                atualizarQuantidade(produtoId, -1);
+            });
+
+            function atualizarQuantidade(produtoId, alteracao) {
+                $.ajax({
+                    url: '/CarrinhoCompra/AtualizarQuantidade',
+                    type: 'POST',
+                    data: {
+                        produtoId: produtoId,
+                        alteracao: alteracao
+                    },
+                    success: function (data) {
+                        // Atualiza a quantidade exibida
+                        $(`[data-produto-id="${produtoId}"] .quantidade`).text(data.novaQuantidade);
+
+                        // Atualiza o subtotal do item
+                        $(`[data-produto-id="${produtoId}"] .subtotal`).text(data.novoSubtotal);
+
+                        // Atualiza o total do carrinho
+                        $('#carrinho-total').text(data.novoTotal);
+                    },
+                    error: function () {
+                        alert('Ocorreu um erro ao atualizar a quantidade');
+                    }
+                });
+            }
+        });
+    </script>
+}
