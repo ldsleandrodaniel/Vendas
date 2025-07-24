@@ -84,7 +84,11 @@
             // Evento para diminuir quantidade
             $(document).on('click', '.diminuir', function () {
                 const produtoId = $(this).data('produto-id');
-                atualizarQuantidade(produtoId, -1);
+                const quantidadeAtual = parseInt($(`[data-produto-id="${produtoId}"] .quantidade`).text());
+                if (quantidadeAtual > 1) {  // Só diminui se for maior que 1
+                    atualizarQuantidade(produtoId, -1);
+                }
+               
             });
 
             function atualizarQuantidade(produtoId, alteracao) {
